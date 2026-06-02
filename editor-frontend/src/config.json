@@ -1,0 +1,9 @@
+{
+    "wordcount": "http://wordcount",
+    "charcount": "http://charcount",
+    "andcount": "http://andcount",
+    "commacount": "http://commacount",
+    "palindromecount": "http://palindromecount",
+    "vowelcount": "http://vowelcount",
+    "statefullSave": "http://statefullsavingtext"
+}

@@ -1,0 +1,8 @@
+{
+    "wordcountURL": "http://wordcount:80",
+    "charcountURL": "http://charcount:80",
+    "andcountURL": "http://andcount:80",
+    "commacountURL": "http://commacount:80",
+    "palindromecountURL": "http://palindromecount:80",
+    "vowelcountURL": "http://vowelcount:80"
+}

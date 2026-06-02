@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QUBeditotron3000</title>
+    
+    <!-- Import Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+    <!-- Firebase configuration (local, git-ignored). Copy firebase-config.example.js to firebase-config.js. -->
+    <script src="firebase-config.js"></script>
+
+    <script type="text/javascript">
+        // Initialize Firebase and Firestore
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        async function SaveText() {
+            const content = document.getElementById("content").value;
+            let customId = document.getElementById("output").value.trim();
+
+            if (!content.trim()) {
+                document.getElementById("output").value = "Error: Cannot save empty text";
+                return;
+            }
+
+            // Generate a random ID if none provided
+            if (!customId) {
+                customId = Math.random().toString(36).substring(2, 15);
+            }
+
+            try {
+                // Save to Firestore
+                await db.collection('texts').doc(customId).set({
+                    content: content,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                document.getElementById("output").value = "Text saved with ID: " + customId;
+            } catch (error) {
+                document.getElementById("output").value = "Error saving: " + error.message;
+                console.error("Save error:", error);
+            }
+        }
+
+        async function ReturnText() {
+            const textId = document.getElementById("output").value.trim();
+
+            if (!textId) {
+                document.getElementById("output").value = "Please enter an ID to load";
+                return;
+            }
+
+            try {
+                // Retrieve from Firestore
+                const doc = await db.collection('texts').doc(textId).get();
+                
+                if (!doc.exists) {
+                    document.getElementById("output").value = "Error: Text not found with ID: " + textId;
+                    return;
+                }
+
+                const data = doc.data();
+                document.getElementById("content").value = data.content;
+                document.getElementById("output").value = "Text loaded successfully from ID: " + textId;
+            } catch (error) {
+                document.getElementById("output").value = "Error loading: " + error.message;
+                console.error("Load error:", error);
+            }
+        }
+
+        async function makeRequest(endpoint, method = 'GET', body = null) {
+            try {
+                const options = {
+                    method: method,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                };
+
+                if (body) {
+                    options.headers['Content-Type'] = 'application/json';
+                    options.body = JSON.stringify(body);
+                }
+
+                const fullUrl = `http://localhost:8000${endpoint}`;
+                const response = await fetch(fullUrl, options);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return await response.json();
+            } catch (error) {
+                console.error("Request error:", error);
+                throw error;
+            }
+        }
+
+        async function Wordcount() {
+            try {
+                const text = document.getElementById("content").value;
+                const response = await makeRequest(`/wordcount?text=${encodeURIComponent(text)}`);
+                document.getElementById("output").value = response.answer;
+            } catch (error) {
+                document.getElementById("output").value = "Error: " + error.message;
+            }
+        }
+
+        async function Charcount() {
+            try {
+                const text = document.getElementById("content").value;
+                const response = await makeRequest(`/charcount?text=${encodeURIComponent(text)}`);
+                document.getElementById("output").value = response.answer;
+            } catch (error) {
+                document.getElementById("output").value = "Error: " + error.message;
+            }
+        }
+
+        async function AndCount() {
+            try {
+                const text = document.getElementById("content").value;
+                const response = await makeRequest(`/andcount?text=${encodeURIComponent(text)}`);
+                document.getElementById("output").value = response.total_ands;
+            } catch (error) {
+                document.getElementById("output").value = "Error: " + error.message;
+            }
+        }
+
+        async function CommaCount() {
+            try {
+                const text = document.getElementById("content").value;
+                const response = await makeRequest(`/commacount?text=${encodeURIComponent(text)}`);
+                document.getElementById("output").value = response.answer;
+            } catch (error) {
+                document.getElementById("output").value = "Error: " + error.message;
+            }
+        }
+
+        async function PalindromeCount() {
+            try {
+                const text = document.getElementById("content").value;
+                const response = await makeRequest(`/palindromecount?text=${encodeURIComponent(text)}`);
+                document.getElementById("output").value = response.answer;
+            } catch (error) {
+                document.getElementById("output").value = "Error: " + error.message;
+            }
+        }
+
+        async function VowelCount() {
+            try {
+                const text = document.getElementById("content").value;
+                const response = await makeRequest(`/vowelcount?text=${encodeURIComponent(text)}`);
+                document.getElementById("output").value = response.answer;
+            } catch (error) {
+                document.getElementById("output").value = "Error: " + error.message;
+            }
+        }
+    </script>
+    
+    <style type="text/css">
+        body {
+            font-size: 150%;
+            font-family: monospace;
+        }
+
+        #logo {
+            font-family: Calibri, sans-serif;
+            font-weight: lighter;
+            color: #505050;
+            margin: 0.5em;
+        }
+
+        #editor {
+            text-align: center;
+            margin-top: 1em;
+        }
+
+        #output {
+            font-size: 100%;
+            padding: 0.5em;
+            margin: 0.5em;
+            font-family: monospace;
+            letter-spacing: 0.1em;
+        }
+
+        #content {
+            font-size: 100%;
+            padding: 0.2em;
+            margin: 0.2em;
+            font-family: monospace;
+            letter-spacing: 0.1em;
+        }
+
+        .operation {
+            border: solid #d0d0d0 1px;
+            background-color: #f0f0f0;
+            padding: 1.5em;
+            margin: 1em;
+            width: 14em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .operation:hover {
+            background-color: #e0e0e0;
+        }
+
+        .setup-instructions {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .setup-instructions code {
+            background-color: #eee;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div id="editor">
+        <div id="logo">QUBeditotron3000</div>
+        <div>
+            <textarea rows="5" cols="40" id="content">It was the best of cloud, it was the worst of cloud...</textarea>
+        </div>
+        <div>
+            <input type="text" id="output" placeholder="Enter text ID to load or see save result" />
+        </div>
+        <div>
+            <button class="operation" onclick="SaveText()">Save Text</button>
+            <button class="operation" onclick="ReturnText()">Return Text</button>
+        </div>
+        <div>
+            <button class="operation" onclick="Wordcount()">Word Count</button>
+            <button class="operation" onclick="Charcount()">Character Count</button>
+        </div>
+        <div>
+            <button class="operation" onclick="AndCount()">And Count</button>
+            <button class="operation" onclick="CommaCount()">Comma Count</button>
+        </div>
+        <div>
+            <button class="operation" onclick="PalindromeCount()">Palindrome Count</button>
+            <button class="operation" onclick="VowelCount()">Vowel Count</button>
+        </div>
+    </div>
+</body>
+</html>

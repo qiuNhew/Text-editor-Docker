@@ -1,0 +1,24 @@
+default:
+  tags:
+    - shell
+
+stages:
+  - test
+  - build
+
+test_pipeline:
+  stage: test
+  before_script:
+    - docker rm -f editor-commacount || true
+    - docker rm -f commacount || true
+    - docker rmi -f commacount || true
+    - docker build -t editor-commacount .
+    - docker run -d --name commacount -p 5001:5000 editor-commacount
+
+  script:
+    - docker exec commacount python3 -m unittest test.py
+    - docker exec commacount python3 -m unittest integrationTest.py
+
+  after_script:
+    - docker stop commacount
+    - docker rm commacount

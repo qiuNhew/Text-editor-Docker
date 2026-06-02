@@ -1,0 +1,23 @@
+default:
+  tags:
+    - shell
+
+stages:
+  - test
+
+test_pipeline:
+  stage: test
+  before_script:
+    - docker rm -f editor-andcount || true
+    - docker rm -f andcount || true
+    - docker rmi -f andcount || true
+    - docker build -t editor-andcount .
+    - docker run -d --name andcount -p 5001:5000 editor-andcount
+
+  script:
+    - docker exec andcount python3 -m unittest test.py
+    - docker exec andcount python3 -m unittest integrationTest.py
+
+  after_script:
+    - docker stop andcount
+    - docker rm andcount

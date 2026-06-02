@@ -91,6 +91,14 @@ services:
       context: ./editor-monitoring
     ports:
       - "8009:80"
+    environment:
+      # Email-alert credentials are injected from the root .env file (see
+      # .env.example). Alerts are skipped if these are left unset.
+      - SMTP_SERVER=${SMTP_SERVER:-smtp.gmail.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SENDER_EMAIL=${SENDER_EMAIL:-}
+      - SENDER_PASSWORD=${SENDER_PASSWORD:-}
+      - RECIPIENT_EMAIL=${RECIPIENT_EMAIL:-}
     networks:
       - editor-network
 

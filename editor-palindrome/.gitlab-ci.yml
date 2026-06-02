@@ -1,0 +1,24 @@
+default:
+  tags:
+    - shell
+
+stages:
+  - test
+  - build
+
+test_pipeline:
+  stage: test
+  before_script:
+    - docker rm -f editor-palindromecount || true
+    - docker rm -f palindromecount || true
+    - docker rmi -f palindromecount || true
+    - docker build -t editor-palindromecount .
+    - docker run -d --name palindromecount -p 5001:5000 editor-palindromecount
+
+  script:
+    - docker exec palindromecount python3 -m unittest test.py
+    - docker exec palindromecount python3 -m unittest integrationTest.py
+
+  after_script:
+    - docker stop palindromecount
+    - docker rm palindromecount

@@ -1,0 +1,22 @@
+default:
+  tags:
+    - shell
+
+stages:
+  - test
+  - build
+
+test_pipeline:
+  stage: test
+  before_script:
+    - docker rm -f editor-wordcount || true
+    - docker rm -f wordcount || true
+    - docker rmi -f wordcount || true
+    - docker build -t editor-wordcount .
+    - docker run -d --name wordcount -p 5004:80 editor-wordcount
+  script:
+    - docker exec wordcount php /var/www/html/test.php
+    - docker exec wordcount php /var/www/html/integrationTest.php
+  after_script:
+    - docker stop wordcount
+    - docker rm wordcount

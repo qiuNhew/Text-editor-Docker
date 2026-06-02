@@ -1,0 +1,45 @@
+# Keep Docker build contexts small and free of secrets.
+# Applied from the build context root of each service.
+
+# Version control / CI
+.git
+.gitignore
+.gitlab-ci.yml
+.github
+
+# Docs
+README.md
+*.md
+LICENSE
+
+# Secrets / env
+.env
+.env.*
+*serviceAccount*.json
+*service-account*.json
+*-credentials.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Node.js
+node_modules/
+npm-debug.log*
+
+# PHP
+vendor/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

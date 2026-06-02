@@ -1,0 +1,24 @@
+default:
+  tags:
+    - shell
+
+stages:
+  - test
+  - build
+
+test_pipeline:
+  stage: test
+  before_script:
+    - docker rm -f editor-vowelcount || true
+    - docker rm -f vowelcount || true
+    - docker rmi -f vowelcount || true
+    - docker build -t editor-vowelcount .
+    - docker run -d --name vowelcount -p 5004:5000 editor-vowelcount
+
+  script:
+    - docker exec vowelcount python3 -m unittest test.py
+    - docker exec vowelcount python3 -m unittest integrationTest.py
+
+  after_script:
+    - docker stop vowelcount
+    - docker rm vowelcount
