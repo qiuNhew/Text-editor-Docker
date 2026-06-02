@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+
+  editor-andcount:
+    container_name: andcount
+    image: andcount
+    build:
+      context: ./editor-andcount
+    ports:
+      - "8003:80"
+    networks:
+      - editor-network
+
+  editor-charcount:
+    container_name: charcount
+    image: charcount
+    build:
+      context: ./editor-charcount
+    ports:
+      - "8004:80"
+    networks:
+      - editor-network
+
+  editor-commacount:
+    container_name: commacount
+    image: commacount
+    build:
+      context: ./editor-commacount
+    ports:
+      - "8005:80"
+    networks:
+      - editor-network
+
+  editor-frontend:
+    container_name: frontend
+    image: frontend
+    build:
+      context: ./editor-frontend
+    ports:
+      - "3000:80"
+    networks:
+      - editor-network
+
+  editor-palindrome:
+    container_name: palindromecount
+    image: palindromecount
+    build:
+      context: ./editor-palindrome
+    ports:
+      - "8006:80"
+    networks:
+      - editor-network
+
+  editor-vowelcount:
+    container_name: vowelcount
+    image: vowelcount
+    build:
+      context: ./editor-vowelcount
+    ports:
+      - "8007:80"
+    networks:
+      - editor-network
+
+  editor-wordcount:
+    container_name: wordcount
+    image: wordcount
+    build:
+      context: ./editor-wordcount
+    ports:
+      - "8008:80"
+    networks:
+      - editor-network
+
+  reverse-proxy:
+    container_name: customproxyrouter
+    image: customproxyrouter
+    build:
+      context: ./editor-customproxyrouter
+    ports:
+      - "8000:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - editor-network
+
+  monitor:
+    container_name: monitoring
+    image: monitoring
+    build:
+      context: ./editor-monitoring
+    ports:
+      - "8009:80"
+    networks:
+      - editor-network
+
+networks:
+  editor-network:
+    driver: bridge
+    attachable: true
